@@ -1,26 +1,55 @@
-name: Auto Commit Immediately
+name: Auto Commit
 
 on:
-  workflow_dispatch: # Cho phép kích hoạt thủ công từ giao diện GitHub
+  schedule:
+    - cron: "0 17 * * *"
 
 jobs:
   auto_commit:
-    name: "Auto push a commit to my repo"
+    name: "Auto push commits to my repo"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3 # Checkout repository
+      - uses: actions/checkout@v3
 
       - name: Set up Git user
         run: |
           git config --global user.name "Automated Committer"
           git config --global user.email "committer@example.com"
 
-      - name: Make a change to report.txt
+      - name: Decide whether to commit today
+        id: skip_commit
         run: |
-          echo "Automated commit at $(date)" >> report.txt  # Thêm dòng mới vào file report.txt
+          SKIP_PROB=$(python3 -c "import random; print(random.choices([0, 1], weights=[70, 30])[0])")
+          echo "Skip commit today? $SKIP_PROB"
+          echo "SKIP=$SKIP_PROB" >> $GITHUB_ENV
 
-      - name: Commit and push
+      - name: Exit if skipping commit
+        if: env.SKIP == '1'
+        run: echo "Skipping commit for today" && exit 0
+
+      - name: Generate random number of commits (1-20, tỉ lệ 10-20 là 10%)
+        id: random_commit_count
         run: |
-          git add report.txt
-          git commit -m "Automated commit at $(date)"
-          git push
+          RANDOM_NUM=$(python3 -c "import random; print(random.choices(list(range(1, 21)), weights=[9]*9 + [1]*11)[0])")
+          echo "Total commits today: $RANDOM_NUM"
+          echo "COMMITS=$RANDOM_NUM" >> $GITHUB_ENV
+
+      - name: Generate and push commits
+        run: |
+          for i in $(seq 1 $COMMITS)
+          do
+         
+            echo "Commit $i at $(date)" >> report.txt
+
+
+            git add report.txt
+            git commit -m "Automated commit #$i at $(date)"
+
+            git pull --rebase origin main
+
+            git push origin main
+
+            SLEEP_TIME=$((RANDOM % 1800 + 1800))  # 1800 giây = 30 phút, 3600 giây = 1 tiếng
+            echo "Sleeping for $SLEEP_TIME seconds before next commit..."
+            sleep $SLEEP_TIME
+          done
