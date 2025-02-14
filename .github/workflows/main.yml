@@ -1,16 +1,16 @@
 name: Auto Commit
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:  # Allows manual triggering from the GitHub UI
   schedule:
-    - cron: "0 17 * * *"
+    - cron: "0 17 * * *"  # 17:00 UTC corresponds to 00:00 GMT+7
 
 jobs:
   auto_commit:
     name: "Auto push commits to my repo"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v3  # Checkout repository
 
       - name: Set up Git user
         run: |
@@ -20,6 +20,7 @@ jobs:
       - name: Decide whether to commit today
         id: skip_commit
         run: |
+          # Randomly decide whether to commit today (30% chance to skip)
           SKIP_PROB=$(python3 -c "import random; print(random.choices([0, 1], weights=[70, 30])[0])")
           echo "Skip commit today? $SKIP_PROB"
           echo "SKIP=$SKIP_PROB" >> $GITHUB_ENV
@@ -28,9 +29,10 @@ jobs:
         if: env.SKIP == '1'
         run: echo "Skipping commit for today" && exit 0
 
-      - name: Generate random number of commits (1-20, tỉ lệ 10-20 là 10%)
+      - name: Generate random number of commits (1-20, 10% chance for 10-20 commits)
         id: random_commit_count
         run: |
+          # Generate a random number of commits with a 10% chance for 10-20 commits
           RANDOM_NUM=$(python3 -c "import random; print(random.choices(list(range(1, 21)), weights=[9]*9 + [1]*11)[0])")
           echo "Total commits today: $RANDOM_NUM"
           echo "COMMITS=$RANDOM_NUM" >> $GITHUB_ENV
@@ -39,18 +41,22 @@ jobs:
         run: |
           for i in $(seq 1 $COMMITS)
           do
+            # Create a small change with GMT+7 timestamp
+            COMMIT_TIME=$(TZ="Asia/Bangkok" date +"%Y-%m-%d %H:%M:%S GMT+7")
+            echo "Commit $i at $COMMIT_TIME" >> report.txt
 
-            echo "Commit $i at $(date)" >> report.txt
-
-
+            # Perform the commit
             git add report.txt
-            git commit -m "Automated commit #$i at $(date)"
+            git commit -m "Automated commit #$i at $COMMIT_TIME"
 
+            # Pull changes from the remote repository before pushing
             git pull --rebase origin main
 
+            # Push the commit
             git push origin main
 
-            SLEEP_TIME=$((RANDOM % 1800 + 1800))  # 1800 giây = 30 phút, 3600 giây = 1 tiếng
-            echo "Sleeping for $SLEEP_TIME seconds before next commit..."
+            # Generate a random wait time between commits (5 to 15 minutes)
+            SLEEP_TIME=$((RANDOM % 600 + 300))  # 300 seconds = 5 minutes, 600 seconds = 10 minutes
+            echo "Sleeping for $SLEEP_TIME seconds before the next commit..."
             sleep $SLEEP_TIME
           done
