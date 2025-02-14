@@ -1,62 +1,26 @@
-name: Auto commit
+name: Auto Commit Immediately
 
 on:
-  schedule:
-    - cron: "0 0 * * *"
+  workflow_dispatch: # Cho phép kích hoạt thủ công từ giao diện GitHub
 
 jobs:
   auto_commit:
     name: "Auto push a commit to my repo"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3 # Checkout repository
 
-      - name: Decide whether to commit today
-        id: skip_commit
+      - name: Set up Git user
         run: |
-          SKIP_PROB=$(python3 -c "import random; print(random.choices([0, 1], weights=[75, 25])[0])")
-          echo "Skip commit? $SKIP_PROB"
-          echo "SKIP=$SKIP_PROB" >> $GITHUB_ENV
+          git config --global user.name "Automated Committer"
+          git config --global user.email "committer@example.com"
 
-      - name: Exit if skipping commit
-        if: env.SKIP == '1'
-        run: echo "Skipping commit for today" && exit 0
-
-      - name: Generate random execution time
-        id: random_time
+      - name: Make a change to report.txt
         run: |
-          RANDOM_HOUR=$((RANDOM % 23 + 1)) 
-          RANDOM_MINUTE=$((RANDOM % 60))   
-          TARGET_TIME=$(date -d "$RANDOM_HOUR:$RANDOM_MINUTE" +%s)
-          CURRENT_TIME=$(date +%s)
-          SLEEP_TIME=$((TARGET_TIME - CURRENT_TIME))
+          echo "Automated commit at $(date)" >> report.txt  # Thêm dòng mới vào file report.txt
 
-          if [ $SLEEP_TIME -gt 0 ]; then
-            echo "Waiting until $RANDOM_HOUR:$RANDOM_MINUTE (Sleeping for $SLEEP_TIME seconds)"
-            sleep $SLEEP_TIME
-          fi
-
-      - name: Generate random number of commits
-        id: random_commit_count
+      - name: Commit and push
         run: |
-          RANDOM_NUM=$(python3 -c "import random; print(random.choices(range(1, 16), weights=[5,5,5,5,5,5,5,3,3,3,2,2,1,1,1])[0])")
-          echo "Commit count: $RANDOM_NUM"
-          echo "COMMITS=$RANDOM_NUM" >> $GITHUB_ENV
-
-      - name: Generate commits
-        run: |
-          for i in $(seq 1 $COMMITS)
-          do
-            TIMESTAMP=$(date +%s)
-            echo "Commit $i at $TIMESTAMP" >> report.txt
-            
-            git config --global user.name 'Automated Suesi 404'
-            git config --global user.email 'suesitran@users.noreply.github.com'
-            git add report.txt
-            git commit -m "Automated commit #$i"
-            git push
-            
-            SLEEP_TIME=$((RANDOM % 1800 + 30)) 
-            echo "Sleeping for $SLEEP_TIME seconds..."
-            sleep $SLEEP_TIME
-          done
+          git add report.txt
+          git commit -m "Automated commit at $(date)"
+          git push
