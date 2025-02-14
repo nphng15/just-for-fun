@@ -1,11 +1,11 @@
 name: Auto Commit
 
 on:
+  workflow_dispatch:
   schedule:
     - cron: "0 17 * * *"
 
 jobs:
-  workflow_dispatch:
   auto_commit:
     name: "Auto push commits to my repo"
     runs-on: ubuntu-latest
