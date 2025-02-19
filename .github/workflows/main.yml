@@ -44,7 +44,7 @@ jobs:
             echo "Commit #$i at $COMMIT_TIME" >> report.txt
 
             git add report.txt
-            git commit -m "Automated commit #$i at $COMMIT_TIME"
+            git commit -m "#$i at $COMMIT_TIME"
             git push 
 
             SLEEP_TIME=$((RANDOM % 600 + 300))  # 300 seconds = 5 minutes, 600 seconds = 10 minutes
