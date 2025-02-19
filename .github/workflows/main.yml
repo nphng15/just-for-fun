@@ -45,10 +45,7 @@ jobs:
 
             git add report.txt
             git commit -m "Automated commit #$i at $COMMIT_TIME"
-
-            git pull --rebase origin main
-
-            git push origin main
+            git push 
 
             SLEEP_TIME=$((RANDOM % 600 + 300))  # 300 seconds = 5 minutes, 600 seconds = 10 minutes
             echo "Sleeping for $SLEEP_TIME seconds before the next commit..."
