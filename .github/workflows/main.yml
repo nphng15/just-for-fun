@@ -14,8 +14,8 @@ jobs:
 
       - name: Set up Git user
         run: |
-          git config --global user.name "Automated Committer"
-          git config --global user.email "committer@example.com"
+          git config --global user.name "nphng15"
+          git config --global user.email "23521172@gm.uit.edu.vn"
 
       - name: Decide whether to commit today
         id: skip_commit
