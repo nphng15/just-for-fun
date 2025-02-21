@@ -41,7 +41,7 @@ jobs:
           do
         
             COMMIT_TIME=$(TZ="Asia/Bangkok" date +"%m%d%Y_%H%M")  # Format as MMDDYYYY_HHMM
-            echo "Commit #$i at $COMMIT_TIME" >> report.txt
+            echo "$COMMIT_TIME" >> report.txt
         
             git add report.txt
             git commit -m "$COMMIT_TIME"
