@@ -3,7 +3,7 @@ name: Auto Commit
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 17 * * *" # 17:00 UTC corresponds to 00:00 GMT+7
+    - cron: "0 0 * * *" 
 
 jobs:
   auto_commit:
