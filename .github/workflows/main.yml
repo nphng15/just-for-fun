@@ -28,10 +28,10 @@ jobs:
         if: env.SKIP == '1'
         run: echo "Skipping commit for today" && exit 0
 
-      - name: Generate random number of commits (1-20, 10% chance for 10-20 commits)
+      - name: Generate random number of commits (1-30, 5% chance for 20-30 commits, 20% chance for 10-20 commits)
         id: random_commit_count
         run: |
-          RANDOM_NUM=$(python3 -c "import random; print(random.choices(list(range(1, 21)), weights=[9]*9 + [1]*11)[0])")
+          RANDOM_NUM=$(python3 -c "import random; print(random.choices(list(range(1, 31)), weights=[75]*10 + [20]*10 + [5]*10)[0])")
           echo "Total commits today: $RANDOM_NUM"
           echo "COMMITS=$RANDOM_NUM" >> $GITHUB_ENV
 
