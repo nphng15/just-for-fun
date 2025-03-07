@@ -39,15 +39,15 @@ jobs:
         run: |
           for i in $(seq 1 $COMMITS)
           do
-        
-            COMMIT_TIME=$(TZ="Asia/Bangkok" date +"%m%d%Y_%H%M")  # Format as MMDDYYYY_HHMM
-            echo "$COMMIT_TIME" >> report.txt
-        
+            # Tạo chuỗi ngẫu nhiên (16 ký tự chữ và số)
+            RANDOM_STRING=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)
+            echo "$RANDOM_STRING" >> report.txt
+
             git add report.txt
-            git commit -m "$COMMIT_TIME"
+            git commit -m "$RANDOM_STRING"
             git push 
-        
-            SLEEP_TIME=$((RANDOM % 600 + 300))  # 300 seconds = 5 minutes, 600 seconds = 10 minutes
+
+            SLEEP_TIME=$((RANDOM % 600 + 300))  # Ngủ từ 5 đến 10 phút
             echo "Sleeping for $SLEEP_TIME seconds before the next commit..."
             sleep $SLEEP_TIME
           done
