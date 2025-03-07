@@ -3,7 +3,7 @@ name: Auto Commit
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 0 * * *" 
+    - cron: "0 0 * * *"
 
 jobs:
   auto_commit:
@@ -39,15 +39,14 @@ jobs:
         run: |
           for i in $(seq 1 $COMMITS)
           do
-        
-            COMMIT_TIME=$(TZ="Asia/Bangkok" date +"%m%d%Y_%H%M")  # Format as MMDDYYYY_HHMM
-            echo "$COMMIT_TIME" >> report.txt
-        
+            RANDOM_STRING=$(head /dev/urandom | tr -dc A-Za-z | head -c 32)
+            echo "$RANDOM_STRING" >> report.txt
+
             git add report.txt
-            git commit -m "$COMMIT_TIME"
+            git commit -m "$RANDOM_STRING"
             git push 
-        
-            SLEEP_TIME=$((RANDOM % 600 + 300))  # 300 seconds = 5 minutes, 600 seconds = 10 minutes
+
+            SLEEP_TIME=$((RANDOM % 600 + 300))  # 300 giây = 5 phút, 600 giây = 10 phút
             echo "Sleeping for $SLEEP_TIME seconds before the next commit..."
             sleep $SLEEP_TIME
           done
